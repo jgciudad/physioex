@@ -67,7 +67,7 @@ class SleepModule(pl.LightningModule):
             self.opt,
             mode="min",
             factor=0.5,
-            patience=3,
+            patience=1,
             threshold=0.0001,
             threshold_mode="rel",
             cooldown=0,
@@ -79,8 +79,8 @@ class SleepModule(pl.LightningModule):
             "scheduler": scheduler,
             "name": "lr_scheduler",
             "monitor": "val_loss",
-            "interval": "step",
-            "frequency": 1000,
+            "interval": "epoch",
+            "frequency": 1,
         }
         return [self.opt], [scheduler]
 
@@ -108,30 +108,28 @@ class SleepModule(pl.LightningModule):
         if self.n_classes > 1:
             loss = self.loss(embeddings, outputs, targets)
 
-            self.log(f"{log}_loss", loss, prog_bar=True)
-            self.log(f"{log}_acc", self.wacc(outputs, targets), prog_bar=True)
-            self.log(f"{log}_f1", self.wf1(outputs, targets), prog_bar=True)
+            self.log(f"{log}_loss", loss, prog_bar=True, sync_dist=True)
+            self.log(f"{log}_acc", self.wacc(outputs, targets), prog_bar=True, sync_dist=True)
+            self.log(f"{log}_f1", self.wf1(outputs, targets), prog_bar=True, sync_dist=True)
         else:
             outputs = outputs.view(-1)
 
             loss = self.loss(embeddings, outputs, targets)
 
-            self.log(f"{log}_loss", loss, prog_bar=True)
-
-            self.log(f"{log}_r2", self.r2(outputs, targets), prog_bar=True)
-            self.log(f"{log}_mae", self.mae(outputs, targets), prog_bar=True)
-            self.log(f"{log}_mse", self.mse(outputs, targets), prog_bar=True)
+            self.log(f"{log}_loss", loss, prog_bar=True, sync_dist=True)
+            self.log(f"{log}_r2", self.r2(outputs, targets), prog_bar=True, sync_dist=True)
+            self.log(f"{log}_mae", self.mae(outputs, targets), prog_bar=True, sync_dist=True)
+            self.log(f"{log}_mse", self.mse(outputs, targets), prog_bar=True, sync_dist=True)
 
         if log_metrics and self.n_classes > 1:
-            self.log(f"{log}_ck", self.ck(outputs, targets))
-            self.log(f"{log}_pr", self.pr(outputs, targets))
-            self.log(f"{log}_rc", self.rc(outputs, targets))
-            self.log(f"{log}_macc", self.macc(outputs, targets))
-            self.log(f"{log}_mf1", self.mf1(outputs, targets))
+            self.log(f"{log}_ck", self.ck(outputs, targets), sync_dist=True)
+            self.log(f"{log}_pr", self.pr(outputs, targets), sync_dist=True)
+            self.log(f"{log}_rc", self.rc(outputs, targets), sync_dist=True)
+            self.log(f"{log}_macc", self.macc(outputs, targets), sync_dist=True)
+            self.log(f"{log}_mf1", self.mf1(outputs, targets), sync_dist=True)
         return loss
 
     def training_step(self, batch, batch_idx):
-        # get the logged metrics
         if "val_loss" not in self.trainer.logged_metrics:
             self.log("val_loss", float("inf"))
 
