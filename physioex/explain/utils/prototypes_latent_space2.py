@@ -439,26 +439,6 @@ def visualize(
             groups.append(get_groups(test_datamodule, dataset_idx_, subject_id_))
 
 
-        # plot transition matrix
-        for c_idx, c in enumerate(channels):
-            transition_matrices[c] = transition_matrices[c] / np.sum(transition_matrices[c], axis=1, keepdims=True)
-            transition_matrices[c] = np.nan_to_num(transition_matrices[c], nan=0)
-        fig, axes = plt.subplots(1, n_channels, figsize=(n_channels*max(n_proto)*0.6, max(n_proto)*0.6), dpi=300)
-        
-        for c_idx, c in enumerate(channels):
-            if isinstance(axes, np.ndarray):
-                ax = axes[c_idx]
-            else:
-                ax = axes
-            sns.heatmap(transition_matrices[c], annot=True, fmt=".2f", cmap="Blues", ax=ax)
-            ax.set_xlabel("Prototype n")
-            ax.set_ylabel("Prototype n+1")
-            ax.set_title(f"Transition Matrix for {c}")
-        plt.tight_layout()
-        save_path = Path(results_path) / 'transition_matrix'   
-        Path(save_path).mkdir(parents=True, exist_ok=True)
-        plt.savefig(save_path / f'{test_datamodule.datasets_id[0]}.png')
-        
         # concatenate all batches
         for c_idx, c in enumerate(channels):
             embeddings[c] = np.concatenate(embeddings[c], axis=0)
@@ -488,58 +468,6 @@ def visualize(
 
         # plot average psd per prototype
         average_psd(channels, mean_psd, results_path)
-
-        # concatenate embeddings and learned prototypes
-        for c_idx, c in enumerate(channels):
-            embeddings[c] = np.concatenate((np.squeeze(embeddings[c]), learned_prototypes[c_idx]), axis=0)
-        
-        # plot embeddings and prototypes
-        projectors = {'UMAP': UMAP(n_components=2, random_state=42),
-                      'PCA': PCA(n_components=2),
-                      't-SNE': TSNE(n_components=2, random_state=42)
-        }
-        
-        for k, v in projectors.items():
-            print('Computing ' + k)
-            initial_time = time.time()
-            fig, axes = plt.subplots(2, n_channels, figsize=(10*n_channels, 15))
-            if axes.ndim == 1:
-                axes = np.expand_dims(axes, axis=1)
-            for c_idx, c in enumerate(channels):
-                embeddings_2d = v.fit_transform(embeddings[c])
-                sns.scatterplot(ax=axes[0, c_idx], x=embeddings_2d[:-n_proto[c_idx], 0], y=embeddings_2d[:-n_proto[c_idx], 1], hue=y, palette=sns.color_palette("bright", len(np.unique(y))))
-                
-                for p in range(n_proto[c_idx]):
-                    axes[0, c_idx].text(embeddings_2d[-n_proto[c_idx]+p, 0], embeddings_2d[-n_proto[c_idx]+p, 1], str(p), fontsize=12, weight='bold', color='black', ha='center', va='center')
-                axes[0, c_idx].set_xlabel(k + " Component 1")
-                axes[0, c_idx].set_ylabel(k + " Component 2")
-                axes[0, c_idx].legend(title="Stage")
-                axes[0, c_idx].set_title(c)
-                xlim = axes[0, c_idx].get_xlim() # Save current limits because voronoi_plot_2d changes them
-                ylim = axes[0, c_idx].get_ylim()
-                # vor = Voronoi(embeddings_2d[-n_proto[c_idx]:])
-                # voronoi_plot_2d(vor, ax=axes[0, c_idx], show_vertices=False, line_colors='black', line_width=1, show_points=False)
-                axes[0, c_idx].set_xlim((xlim[0], xlim[1]*1.25)) # Restore the original limits and make space for legend
-                axes[0, c_idx].set_ylim(ylim)
-                
-                sns.scatterplot(ax=axes[1, c_idx], x=embeddings_2d[:-n_proto[c_idx], 0], y=embeddings_2d[:-n_proto[c_idx], 1], hue=proto_idx[:,c_idx], palette=sns.color_palette("bright", n_proto[c_idx]))
-                for p in range(n_proto[c_idx]):
-                    axes[1, c_idx].text(embeddings_2d[-n_proto[c_idx]+p, 0], embeddings_2d[-n_proto[c_idx]+p, 1], str(p), fontsize=12, weight='bold', color='black', ha='center', va='center')
-                axes[1, c_idx].set_xlabel(k + " Component 1")
-                axes[1, c_idx].set_ylabel(k + " Component 2")
-                axes[1, c_idx].legend(title="Prototype", ncol=2)
-                axes[1, c_idx].set_title(c)
-                xlim = axes[1, c_idx].get_xlim() # Save current limits because voronoi_plot_2d changes them
-                ylim = axes[1, c_idx].get_ylim()
-                # voronoi_plot_2d(vor, ax=axes[1, c_idx], show_vertices=False, line_colors='black', line_width=1, show_points=False)
-                axes[1, c_idx].set_xlim((xlim[0], xlim[1]*1.25)) # Restore the original limits and make space for legend
-                axes[1, c_idx].set_ylim(ylim)
-                
-            fig.suptitle(k + " of Embeddings")
-            save_path = Path(results_path) / 'embeddings' / k.lower()
-            Path(save_path).mkdir(parents=True, exist_ok=True)
-            plt.savefig(save_path / f'{test_datamodule.datasets_id[0]}.png')
-            print(f'{k} took {time.time() - initial_time} seconds')
 
 
 
