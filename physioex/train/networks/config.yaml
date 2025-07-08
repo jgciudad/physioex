@@ -8,6 +8,14 @@ seqsleepnet:
   preprocessing : xsleepnet
   target_transform: null
 
+seqsleepnet_gp:
+  model: physioex.train.networks.seqsleepnet:SeqSleepNet
+  preprocessing : xsleepnet
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    n_classes: 2
+
 sleeptransformer:
   model: physioex.train.networks.sleeptransformer:SleepTransformer
   preprocessing : xsleepnet
@@ -32,6 +40,16 @@ seqsexnet:
     weight_decay :  .0000001
     n_classes: 2
 
+protosleepnet_old:
+  model: physioex.train.networks.prototype_old:ProtoSleepNetOld
+  preprocessing : xsleepnet
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : [50, 20] # must match number of channels
+
 protosleepnet:
   model: physioex.train.networks.prototype:ProtoSleepNet
   preprocessing : xsleepnet
@@ -42,15 +60,201 @@ protosleepnet:
     S : 2
     n_prototypes : 50
 
-protosleepnetv1:
-  model: physioex.train.networks.prototypev1:ProtoSleepNet
+protosleepnet16:
+  model: physioex.train.networks.prototype:ProtoSleepNet
   preprocessing : xsleepnet
   target_transform: null
   model_kwargs:
     learning_rate : .00001
     N : 1
     S : 2
+    n_prototypes : 16
+
+protosleepnet10:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : 10
+
+protosleepnet5:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : 5
+
+protosleepnet_10_5:
+  model: physioex.train.networks.my_prototype:ProtoSleepNet
+  preprocessing : xsleepnet
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : [10, 5] # must match number of channels
+    n_classes: 5
+
+protosleepnet_20_10:
+  model: physioex.train.networks.my_prototype:ProtoSleepNet
+  preprocessing : xsleepnet
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : [20, 10] # must match number of channels
+    n_classes: 5
+
+protosleepnet_30_10_10:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : [30, 10, 10] # must match number of channels
+    n_classes: 5
+
+protosleepnet_10_5_gp:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : [10, 5] # must match number of channels
+    n_classes: 2
+
+protosleepnet_20_10_gp:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : [20, 10] # must match number of channels
+    n_classes: 2
+
+protosleepnet50_m:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet_mouse
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
     n_prototypes : 50
+    n_classes: 3
+
+protosleepnet16_m:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet_mouse
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : 16
+    n_classes: 3
+
+protosleepnet10_m:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet_mouse
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : 10
+    n_classes: 3
+
+protosleepnet5_m:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet_mouse
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : 5
+    n_classes: 3
+
+protosleepnet3_m:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet_mouse
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : 3
+    n_classes: 3
+
+protosleepnet_3_3_m:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet_mouse
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : [3, 3] # must match number of channels
+    n_classes: 3
+
+protosleepnet_3_2_m:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet_mouse
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : [3, 2] # must match number of channels
+    n_classes: 3
+
+
+# protosleepnet_5_3_m:
+#   model: physioex.train.networks.prototype:ProtoSleepNet
+#   preprocessing : xsleepnet
+#   target_transform: null
+#   model_kwargs:
+#     learning_rate : .00001
+#     N : 1
+#     S : 2
+#     n_prototypes : [3, 3] # must match number of channels
+
+protosleepnet_5_5_m:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet_mouse
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : [5, 5] # must match number of channels
+    n_classes: 3
+
+protosleepnet_10_3_m:
+  model: physioex.train.networks.prototype:ProtoSleepNet
+  preprocessing : xsleepnet_mouse
+  target_transform: null
+  model_kwargs:
+    learning_rate : .00001
+    N : 1
+    S : 2
+    n_prototypes : [10, 3] # must match number of channels
+    n_classes: 3
+
 
 
 default:
